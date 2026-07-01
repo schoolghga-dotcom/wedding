@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Свадебное приглашение | Серго и Мариам</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-decoration"></div>
+    <main class="container">
+      <section class="hero card fade-in">
+        <p class="eyebrow">Wedding day</p>
+        <h1>Серго <span>&</span> Мариам</h1>
+        <p class="lead">
+          С огромной радостью приглашаем вас разделить с нами самый трепетный и
+          важный день нашей жизни. Для нас большая честь провести этот вечер в
+          кругу родных и близких сердец.
+        </p>
+        <a class="btn" href="#rsvp">Подтвердить присутствие</a>
+      </section>
+
+      <section class="gallery card fade-in">
+        <h2>Наша история в кадрах</h2>
+        <div class="gallery-grid">
+          <img class="photo-1" src="assets/photo-1.png" alt="Серго и Мариам на крыше" />
+          <img class="photo-2" src="assets/photo-2.png" alt="Пара сидит на крыше" />
+          <img class="photo-3" src="assets/photo-3.png" alt="Серго и Мариам держатся за руки" />
+          <img class="photo-4" src="assets/photo-4.png" alt="Пара смотрит друг на друга" />
+        </div>
+      </section>
+
+      <section class="details card fade-in">
+        <h2>Детали торжества</h2>
+        <div class="grid">
+          <article>
+            <h3>Дата</h3>
+            <p>02.08.2026</p>
+          </article>
+          <article>
+            <h3>Место</h3>
+            <p>Император Холл</p>
+          </article>
+          <article>
+            <h3>Адрес</h3>
+            <p>Москва, Можайское шоссе 17/1</p>
+          </article>
+          <article>
+            <h3>Сбор гостей</h3>
+            <p>16:00</p>
+          </article>
+          <article>
+            <h3>Начало</h3>
+            <p>17:00</p>
+          </article>
+          <article>
+            <h3>Дресс-код</h3>
+            <p>Вечерний</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="countdown card fade-in">
+        <h2>До начала праздника осталось</h2>
+        <div id="countdown" class="timer">
+          <div><span id="days">00</span><small>дней</small></div>
+          <div><span id="hours">00</span><small>часов</small></div>
+          <div><span id="minutes">00</span><small>минут</small></div>
+          <div><span id="seconds">00</span><small>секунд</small></div>
+        </div>
+      </section>
+
+      <section class="music card fade-in">
+        <h2>Музыка вечера</h2>
+        <p>
+          Подберем плейлист, который создаст идеальное настроение для теплого
+          и красивого вечера.
+        </p>
+      </section>
+
+      <section class="map card fade-in">
+        <h2>Как добраться</h2>
+        <p>
+          Будем ждать вас в ресторане «Император Холл». Для удобства ниже
+          размещена карта.
+        </p>
+        <div class="map-frame">
+          <iframe
+            title="Карта: Москва, Можайское шоссе 17/1"
+            src="https://www.google.com/maps?q=Москва,+Можайское+шоссе+17/1&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+        <a
+          class="btn map-btn"
+          href="https://maps.google.com/?q=Москва,+Можайское+шоссе+17/1"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Открыть в картах</a
+        >
+      </section>
+
+      <section id="rsvp" class="rsvp card fade-in">
+        <h2>Анкета гостя</h2>
+        <p>Пожалуйста, заполните форму, чтобы мы подготовили все идеально.</p>
+        <form id="guest-auth-form" autocomplete="on" class="auth-form">
+          <label>
+            Ваше имя и фамилия
+            <input type="text" name="guestName" placeholder="Например: Анна Петрова" required />
+          </label>
+          <button class="btn" type="submit">Продолжить</button>
+          <p id="auth-message" aria-live="polite"></p>
+        </form>
+
+        <form id="rsvp-form" autocomplete="on" class="is-hidden">
+          <input type="hidden" name="guestName" id="guest-name-hidden" />
+
+          <label>
+            Придете ли вы?
+            <select name="attendance" required>
+              <option value="" selected disabled>Выберите вариант</option>
+              <option value="Да">Да</option>
+              <option value="Нет">Нет</option>
+            </select>
+          </label>
+
+          <label>
+            С кем придете?
+            <select name="companions" required>
+              <option value="" selected disabled>Выберите вариант</option>
+              <option value="Один / одна">Один / одна</option>
+              <option value="С половинкой">С половинкой</option>
+              <option value="С семьей">С семьей</option>
+            </select>
+          </label>
+
+          <label>
+            Количество гостей с вами
+            <select name="guestCount" required>
+              <option value="" selected disabled>Выберите вариант</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6+">6+</option>
+            </select>
+          </label>
+
+          <label>
+            Будете ли вы с детьми?
+            <select name="kids" required>
+              <option value="" selected disabled>Выберите вариант</option>
+              <option value="Да">Да</option>
+              <option value="Нет">Нет</option>
+            </select>
+          </label>
+
+          <label>
+            Что предпочитаете пить?
+            <select name="drinks" id="drinks-select" required>
+              <option value="" selected disabled>Выберите вариант</option>
+              <option value="Вино">Вино</option>
+              <option value="Водка">Водка</option>
+              <option value="Коньяк">Коньяк</option>
+              <option value="За рулем">За рулем</option>
+              <option value="Свой вариант">Свой вариант</option>
+            </select>
+          </label>
+          <label id="custom-drink-wrap" class="is-hidden">
+            Ваш вариант напитка
+            <input
+              type="text"
+              name="customDrink"
+              id="custom-drink"
+              placeholder="Напишите ваш вариант"
+            />
+          </label>
+
+          <button class="btn" type="submit">Отправить ответ</button>
+          <p id="form-message" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="admin card fade-in">
+        <h2>Админ-панель</h2>
+        <p>Вход только для организаторов.</p>
+        <form id="admin-login-form" class="auth-form">
+          <label>
+            Пароль администратора
+            <input type="password" name="adminPassword" placeholder="Введите пароль" required />
+          </label>
+          <button class="btn" type="submit">Войти в админ-панель</button>
+          <p id="admin-message" aria-live="polite"></p>
+        </form>
+
+        <div id="admin-dashboard" class="is-hidden">
+          <div class="admin-top">
+            <article>
+              <h3>Всего ответов</h3>
+              <p id="total-responses">0</p>
+            </article>
+            <article>
+              <h3>Всего гостей</h3>
+              <p id="total-guests">0</p>
+            </article>
+          </div>
+
+          <div id="stats-rings" class="rings"></div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Гость</th>
+                  <th>Придет</th>
+                  <th>С кем</th>
+                  <th>Кол-во</th>
+                  <th>Дети</th>
+                  <th>Напиток</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="responses-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="delete-modal" class="modal is-hidden" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+      <div class="modal-card">
+        <h3 id="delete-title">Удалить ответ гостя?</h3>
+        <p id="delete-text">Вы уверены, что хотите удалить эту запись?</p>
+        <div class="modal-actions">
+          <button id="cancel-delete-btn" type="button" class="btn btn-ghost">Отмена</button>
+          <button id="confirm-delete-btn" type="button" class="btn btn-danger">Удалить</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
