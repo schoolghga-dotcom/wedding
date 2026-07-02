@@ -26,15 +26,9 @@
         <a class="btn" href="#rsvp">Подтвердить присутствие</a>
       </section>
 
-      <section class="gallery card fade-in">
-        <h2>Наша история в кадрах</h2>
-        <div class="gallery-grid">
-          <img class="photo-1" src="assets/photo-1.png" alt="Серго и Мариам на крыше" />
-          <img class="photo-2" src="assets/photo-2.png" alt="Пара сидит на крыше" />
-          <img class="photo-3" src="assets/photo-3.png" alt="Серго и Мариам держатся за руки" />
-          <img class="photo-4" src="assets/photo-4.png" alt="Пара смотрит друг на друга" />
-        </div>
-      </section>
+      <figure class="photo-block card fade-in">
+        <img class="photo-1" src="assets/photo-1.png" alt="Серго и Мариам на крыше" />
+      </figure>
 
       <section class="details card fade-in">
         <h2>Детали торжества</h2>
@@ -66,6 +60,10 @@
         </div>
       </section>
 
+      <figure class="photo-block card fade-in">
+        <img class="photo-2" src="assets/photo-2.png" alt="Пара сидит на крыше" />
+      </figure>
+
       <section class="countdown card fade-in">
         <h2>До начала праздника осталось</h2>
         <div id="countdown" class="timer">
@@ -76,6 +74,10 @@
         </div>
       </section>
 
+      <figure class="photo-block card fade-in">
+        <img class="photo-3" src="assets/photo-3.png" alt="Серго и Мариам держатся за руки" />
+      </figure>
+
       <section class="music card fade-in">
         <h2>Музыка вечера</h2>
         <p>
@@ -83,6 +85,10 @@
           и красивого вечера.
         </p>
       </section>
+
+      <figure class="photo-block card fade-in">
+        <img class="photo-4" src="assets/photo-4.png" alt="Пара смотрит друг на друга" />
+      </figure>
 
       <section class="map card fade-in">
         <h2>Как добраться</h2>
@@ -234,6 +240,34 @@
         </div>
       </section>
     </main>
+
+    <audio id="bg-music" src="assets/background-music.mp3" loop preload="auto"></audio>
+
+    <button id="music-toggle-btn" class="music-fab" type="button" aria-label="Управление музыкой" title="Громкость">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M11 5L6 9H3v6h3l5 4V5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M15.5 8.5a5 5 0 010 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M18 6a8.5 8.5 0 010 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+
+    <div id="volume-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="volume-title">
+      <div class="modal-card volume-modal-card">
+        <h3 id="volume-title">Фоновая музыка</h3>
+        <p>Charles Aznavour — Tous les visages de l'amour</p>
+        <label class="volume-control">
+          Громкость
+          <div class="volume-row">
+            <input id="volume-slider" type="range" min="0" max="100" value="20" />
+            <span id="volume-value">20%</span>
+          </div>
+        </label>
+        <div class="modal-actions volume-actions">
+          <button id="skip-music-btn" type="button" class="btn btn-ghost">Позже</button>
+          <button id="start-music-btn" type="button" class="btn">Включить музыку</button>
+        </div>
+      </div>
+    </div>
 
     <div id="delete-modal" class="modal is-hidden" role="dialog" aria-modal="true" aria-labelledby="delete-title">
       <div class="modal-card">

@@ -26,7 +26,83 @@ const deleteModal = document.getElementById("delete-modal");
 const deleteText = document.getElementById("delete-text");
 const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
 const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
+const bgMusic = document.getElementById("bg-music");
+const volumeModal = document.getElementById("volume-modal");
+const volumeSlider = document.getElementById("volume-slider");
+const volumeValue = document.getElementById("volume-value");
+const startMusicBtn = document.getElementById("start-music-btn");
+const skipMusicBtn = document.getElementById("skip-music-btn");
+const musicToggleBtn = document.getElementById("music-toggle-btn");
+const volumeStorageKey = "wedding-bg-music-volume-v1";
 let pendingDeleteGuest = "";
+let musicStarted = false;
+
+const DEFAULT_VOLUME = 0.2;
+
+function initBackgroundMusic() {
+  if (!bgMusic || !volumeSlider || !volumeValue) {
+    return;
+  }
+
+  const savedVolume = localStorage.getItem(volumeStorageKey);
+  const initialVolume = savedVolume !== null ? Number(savedVolume) : DEFAULT_VOLUME;
+  const clampedVolume = Number.isFinite(initialVolume)
+    ? Math.min(1, Math.max(0, initialVolume))
+    : DEFAULT_VOLUME;
+
+  bgMusic.volume = clampedVolume;
+  bgMusic.loop = true;
+  volumeSlider.value = String(Math.round(clampedVolume * 100));
+  volumeValue.textContent = `${Math.round(clampedVolume * 100)}%`;
+
+  volumeSlider.addEventListener("input", () => {
+    const volume = Number(volumeSlider.value) / 100;
+    bgMusic.volume = volume;
+    volumeValue.textContent = `${volumeSlider.value}%`;
+    localStorage.setItem(volumeStorageKey, String(volume));
+  });
+
+  startMusicBtn.addEventListener("click", async () => {
+    if (musicStarted) {
+      closeVolumeModal();
+      return;
+    }
+
+    try {
+      await bgMusic.play();
+      musicStarted = true;
+      startMusicBtn.textContent = "Закрыть";
+      closeVolumeModal();
+    } catch {
+      volumeValue.textContent = "Нажмите «Включить музыку»";
+    }
+  });
+
+  skipMusicBtn.addEventListener("click", closeVolumeModal);
+
+  musicToggleBtn.addEventListener("click", () => {
+    if (musicStarted) {
+      startMusicBtn.textContent = "Закрыть";
+    } else {
+      startMusicBtn.textContent = "Включить музыку";
+    }
+    openVolumeModal();
+  });
+
+  volumeModal.addEventListener("click", (event) => {
+    if (event.target === volumeModal) {
+      closeVolumeModal();
+    }
+  });
+}
+
+function openVolumeModal() {
+  volumeModal.classList.remove("is-hidden");
+}
+
+function closeVolumeModal() {
+  volumeModal.classList.add("is-hidden");
+}
 
 function initScrollAnimations() {
   const elements = document.querySelectorAll(".fade-in");
@@ -88,6 +164,7 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 initScrollAnimations();
+initBackgroundMusic();
 
 function getResponses() {
   const raw = localStorage.getItem(storageKey);
