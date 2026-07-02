@@ -1,1 +1,1 @@
-https://schoolghga-dotcom.github.io/wadding/
+https://schoolghga-dotcom.github.io/wedding/
