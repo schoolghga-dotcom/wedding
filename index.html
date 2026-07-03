@@ -137,14 +137,14 @@
 
           <label>
             Придете ли вы?
-            <select name="attendance" required>
+            <select name="attendance" id="attendance-select" required>
               <option value="" selected disabled>Выберите вариант</option>
               <option value="Да">Да</option>
               <option value="Нет">Нет</option>
             </select>
           </label>
 
-          <label>
+          <label class="attendance-detail-field">
             С кем придете?
             <select name="companions" required>
               <option value="" selected disabled>Выберите вариант</option>
@@ -154,7 +154,7 @@
             </select>
           </label>
 
-          <label>
+          <label class="attendance-detail-field">
             Количество гостей с вами
             <select name="guestCount" required>
               <option value="" selected disabled>Выберите вариант</option>
@@ -167,7 +167,7 @@
             </select>
           </label>
 
-          <label>
+          <label class="attendance-detail-field">
             Будете ли вы с детьми?
             <select name="kids" required>
               <option value="" selected disabled>Выберите вариант</option>
@@ -176,7 +176,7 @@
             </select>
           </label>
 
-          <label>
+          <label class="attendance-detail-field">
             Что предпочитаете пить?
             <select name="drinks" id="drinks-select" required>
               <option value="" selected disabled>Выберите вариант</option>
@@ -187,7 +187,7 @@
               <option value="Свой вариант">Свой вариант</option>
             </select>
           </label>
-          <label id="custom-drink-wrap" class="is-hidden">
+          <label id="custom-drink-wrap" class="attendance-detail-field is-hidden">
             Ваш вариант напитка
             <input
               type="text"

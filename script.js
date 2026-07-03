@@ -1,7 +1,8 @@
 const weddingDate = new Date("2026-08-02T17:00:00+03:00").getTime();
 const storageKey = "wedding-rsvp-responses-v1";
 const adminPassword = "admin2026";
-const sheetApiUrl = "";
+// Paste the Google Apps Script Web app URL ending with /exec here.
+const sheetApiUrl = "https://script.google.com/macros/s/AKfycbxxjH-jp1KWCeIVVYjyyY6MBkzbb7N3jRMh_zfITuBoSDDR93AxOCPG5b-xpBOAMpA/exec";
 const sheetApiToken = "admin2026";
 const chartColors = ["#a87f67", "#7d9d89", "#d39b6a", "#7d88b7", "#d07f8a", "#9f8f80"];
 
@@ -14,6 +15,8 @@ const authMessage = document.getElementById("auth-message");
 const guestNameHidden = document.getElementById("guest-name-hidden");
 const rsvpForm = document.getElementById("rsvp-form");
 const formMessage = document.getElementById("form-message");
+const attendanceSelect = document.getElementById("attendance-select");
+const attendanceDetailFields = document.querySelectorAll(".attendance-detail-field");
 const drinksSelect = document.getElementById("drinks-select");
 const customDrinkWrap = document.getElementById("custom-drink-wrap");
 const customDrinkInput = document.getElementById("custom-drink");
@@ -170,6 +173,37 @@ initBackgroundMusic();
 
 function isSheetApiEnabled() {
   return sheetApiUrl.trim() !== "";
+}
+
+function isGuestAttending() {
+  return attendanceSelect.value !== "Нет";
+}
+
+function updateAttendanceFields() {
+  const shouldShowDetails = isGuestAttending();
+
+  attendanceDetailFields.forEach((field) => {
+    field.classList.toggle("is-hidden", !shouldShowDetails);
+    field.querySelectorAll("select, input").forEach((control) => {
+      control.disabled = !shouldShowDetails;
+      if (!shouldShowDetails) {
+        control.required = false;
+        control.value = "";
+      }
+    });
+  });
+
+  if (shouldShowDetails) {
+    rsvpForm.querySelector('[name="companions"]').required = true;
+    rsvpForm.querySelector('[name="guestCount"]').required = true;
+    rsvpForm.querySelector('[name="kids"]').required = true;
+    drinksSelect.required = true;
+    customDrinkInput.required = drinksSelect.value === "Свой вариант";
+    customDrinkWrap.classList.toggle("is-hidden", drinksSelect.value !== "Свой вариант");
+  } else {
+    customDrinkWrap.classList.add("is-hidden");
+    customDrinkInput.required = false;
+  }
 }
 
 function callSheetApi(action, data = {}) {
@@ -387,8 +421,11 @@ async function refreshAdminDashboard() {
   try {
     const responses = await loadResponses();
     renderAdminDashboard(responses);
-    adminMessage.textContent = "";
-  } catch {
+    adminMessage.textContent = isSheetApiEnabled()
+      ? ""
+      : "Google таблица не подключена: ответы хранятся только в этом браузере.";
+  } catch (error) {
+    console.error(error);
     adminMessage.textContent = "Не удалось загрузить ответы. Проверьте ссылку Apps Script.";
   }
 }
@@ -409,9 +446,11 @@ guestAuthForm.addEventListener("submit", (event) => {
 });
 
 drinksSelect.addEventListener("change", () => {
-  const isCustom = drinksSelect.value === "Свой вариант";
-  customDrinkWrap.classList.toggle("is-hidden", !isCustom);
-  customDrinkInput.required = isCustom;
+  updateAttendanceFields();
+});
+
+attendanceSelect.addEventListener("change", () => {
+  updateAttendanceFields();
 });
 
 rsvpForm.addEventListener("submit", async (event) => {
@@ -436,16 +475,19 @@ rsvpForm.addEventListener("submit", async (event) => {
 
   try {
     await saveResponse(payload);
-    formMessage.textContent = "Спасибо! Ваш ответ сохранен.";
+    formMessage.textContent = isSheetApiEnabled()
+      ? "Спасибо! Ваш ответ сохранен."
+      : "Спасибо! Ответ сохранен только на этом устройстве, потому что Google таблица еще не подключена.";
     rsvpForm.reset();
-    customDrinkWrap.classList.add("is-hidden");
-    customDrinkInput.required = false;
+    guestNameHidden.value = payload.guestName;
+    updateAttendanceFields();
 
     if (!adminDashboard.classList.contains("is-hidden")) {
       await refreshAdminDashboard();
     }
-  } catch {
-    formMessage.textContent = "Не удалось сохранить ответ. Попробуйте еще раз.";
+  } catch (error) {
+    console.error(error);
+    formMessage.textContent = "Не удалось сохранить ответ. Проверьте подключение Google таблицы.";
   }
 });
 

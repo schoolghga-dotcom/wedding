@@ -5,7 +5,7 @@ const HEADERS = [
   "guestName",
   "attendance",
   "companions",
-  "guestCount",
+  "guestCount", 
   "kids",
   "drinks",
   "drinkFinal",
