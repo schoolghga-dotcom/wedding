@@ -1,6 +1,8 @@
 const weddingDate = new Date("2026-08-02T17:00:00+03:00").getTime();
 const storageKey = "wedding-rsvp-responses-v1";
 const adminPassword = "admin2026";
+const sheetApiUrl = "";
+const sheetApiToken = "admin2026";
 const chartColors = ["#a87f67", "#7d9d89", "#d39b6a", "#7d88b7", "#d07f8a", "#9f8f80"];
 
 const daysEl = document.getElementById("days");
@@ -166,13 +168,102 @@ setInterval(updateCountdown, 1000);
 initScrollAnimations();
 initBackgroundMusic();
 
-function getResponses() {
+function isSheetApiEnabled() {
+  return sheetApiUrl.trim() !== "";
+}
+
+function callSheetApi(action, data = {}) {
+  if (!isSheetApiEnabled()) {
+    return Promise.reject(new Error("Google Sheet API URL is not configured."));
+  }
+
+  const callbackName = `weddingSheetCallback_${Date.now()}_${Math.random()
+    .toString(36)
+    .slice(2)}`;
+  const params = new URLSearchParams({
+    action,
+    callback: callbackName,
+    token: sheetApiToken,
+  });
+
+  Object.entries(data).forEach(([key, value]) => {
+    params.set(key, value == null ? "" : String(value));
+  });
+
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    const cleanup = () => {
+      script.remove();
+      delete window[callbackName];
+      clearTimeout(timeoutId);
+    };
+    const timeoutId = setTimeout(() => {
+      cleanup();
+      reject(new Error("Google Sheet API request timed out."));
+    }, 15000);
+
+    window[callbackName] = (response) => {
+      cleanup();
+      if (!response || response.ok === false) {
+        reject(new Error(response?.error || "Google Sheet API error."));
+        return;
+      }
+      resolve(response);
+    };
+
+    script.onerror = () => {
+      cleanup();
+      reject(new Error("Google Sheet API request failed."));
+    };
+
+    const separator = sheetApiUrl.includes("?") ? "&" : "?";
+    script.src = `${sheetApiUrl}${separator}${params.toString()}`;
+    document.body.appendChild(script);
+  });
+}
+
+function getLocalResponses() {
   const raw = localStorage.getItem(storageKey);
   return raw ? JSON.parse(raw) : [];
 }
 
-function saveResponses(data) {
+function saveLocalResponses(data) {
   localStorage.setItem(storageKey, JSON.stringify(data));
+}
+
+function saveLocalResponse(payload) {
+  const responses = getLocalResponses();
+  const filtered = responses.filter((item) => item.guestName !== payload.guestName);
+  filtered.push(payload);
+  saveLocalResponses(filtered);
+}
+
+async function loadResponses() {
+  if (!isSheetApiEnabled()) {
+    return getLocalResponses();
+  }
+
+  const response = await callSheetApi("list");
+  return Array.isArray(response.responses) ? response.responses : [];
+}
+
+async function saveResponse(payload) {
+  if (!isSheetApiEnabled()) {
+    saveLocalResponse(payload);
+    return;
+  }
+
+  await callSheetApi("save", payload);
+}
+
+async function deleteResponse(guestName) {
+  if (!isSheetApiEnabled()) {
+    const updated = getLocalResponses().filter((item) => item.guestName !== guestName);
+    saveLocalResponses(updated);
+    return;
+  }
+
+  await callSheetApi("delete", { guestName });
 }
 
 function closeDeleteModal() {
@@ -234,8 +325,16 @@ function buildRing(title, statMap) {
   return card;
 }
 
-function renderAdminDashboard() {
-  const responses = getResponses();
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function renderAdminDashboard(responses) {
   totalResponsesEl.textContent = String(responses.length);
   totalGuestsEl.textContent = String(
     responses.reduce((sum, response) => {
@@ -248,14 +347,14 @@ function renderAdminDashboard() {
   responses.forEach((response) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td data-label="Гость">${response.guestName}</td>
-      <td data-label="Придет">${response.attendance}</td>
-      <td data-label="С кем">${response.companions}</td>
-      <td data-label="Кол-во">${response.guestCount}</td>
-      <td data-label="Дети">${response.kids}</td>
-      <td data-label="Напиток">${response.drinkFinal}</td>
+      <td data-label="Гость">${escapeHtml(response.guestName)}</td>
+      <td data-label="Придет">${escapeHtml(response.attendance)}</td>
+      <td data-label="С кем">${escapeHtml(response.companions)}</td>
+      <td data-label="Кол-во">${escapeHtml(response.guestCount)}</td>
+      <td data-label="Дети">${escapeHtml(response.kids)}</td>
+      <td data-label="Напиток">${escapeHtml(response.drinkFinal)}</td>
       <td class="delete-cell">
-        <button class="delete-btn" type="button" data-guest="${response.guestName}" aria-label="Удалить гостя">
+        <button class="delete-btn" type="button" data-guest="${escapeHtml(response.guestName)}" aria-label="Удалить гостя">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M3 6h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
             <path d="M8 6V4.9C8 4.4 8.4 4 8.9 4h6.2c.5 0 .9.4.9.9V6" stroke="currentColor" stroke-width="1.8"/>
@@ -282,6 +381,18 @@ function renderAdminDashboard() {
   });
 }
 
+async function refreshAdminDashboard() {
+  adminMessage.textContent = "Загружаем ответы...";
+
+  try {
+    const responses = await loadResponses();
+    renderAdminDashboard(responses);
+    adminMessage.textContent = "";
+  } catch {
+    adminMessage.textContent = "Не удалось загрузить ответы. Проверьте ссылку Apps Script.";
+  }
+}
+
 guestAuthForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const formData = new FormData(guestAuthForm);
@@ -303,7 +414,7 @@ drinksSelect.addEventListener("change", () => {
   customDrinkInput.required = isCustom;
 });
 
-rsvpForm.addEventListener("submit", (event) => {
+rsvpForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const formData = new FormData(rsvpForm);
   const customDrink = String(formData.get("customDrink") || "").trim();
@@ -321,18 +432,24 @@ rsvpForm.addEventListener("submit", (event) => {
     submittedAt: new Date().toISOString(),
   };
 
-  const responses = getResponses();
-  const filtered = responses.filter((item) => item.guestName !== payload.guestName);
-  filtered.push(payload);
-  saveResponses(filtered);
+  formMessage.textContent = "Сохраняем ответ...";
 
-  formMessage.textContent = "Спасибо! Ваш ответ сохранен.";
-  rsvpForm.reset();
-  customDrinkWrap.classList.add("is-hidden");
-  customDrinkInput.required = false;
+  try {
+    await saveResponse(payload);
+    formMessage.textContent = "Спасибо! Ваш ответ сохранен.";
+    rsvpForm.reset();
+    customDrinkWrap.classList.add("is-hidden");
+    customDrinkInput.required = false;
+
+    if (!adminDashboard.classList.contains("is-hidden")) {
+      await refreshAdminDashboard();
+    }
+  } catch {
+    formMessage.textContent = "Не удалось сохранить ответ. Попробуйте еще раз.";
+  }
 });
 
-adminLoginForm.addEventListener("submit", (event) => {
+adminLoginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const formData = new FormData(adminLoginForm);
   const password = String(formData.get("adminPassword") || "");
@@ -343,7 +460,7 @@ adminLoginForm.addEventListener("submit", (event) => {
 
   adminMessage.textContent = "";
   adminDashboard.classList.remove("is-hidden");
-  renderAdminDashboard();
+  await refreshAdminDashboard();
 });
 
 responsesBody.addEventListener("click", (event) => {
@@ -367,16 +484,24 @@ responsesBody.addEventListener("click", (event) => {
 
 cancelDeleteBtn.addEventListener("click", closeDeleteModal);
 
-confirmDeleteBtn.addEventListener("click", () => {
+confirmDeleteBtn.addEventListener("click", async () => {
   if (!pendingDeleteGuest) {
     closeDeleteModal();
     return;
   }
 
-  const updated = getResponses().filter((item) => item.guestName !== pendingDeleteGuest);
-  saveResponses(updated);
-  renderAdminDashboard();
-  closeDeleteModal();
+  const guestName = pendingDeleteGuest;
+  confirmDeleteBtn.disabled = true;
+
+  try {
+    await deleteResponse(guestName);
+    closeDeleteModal();
+    await refreshAdminDashboard();
+  } catch {
+    adminMessage.textContent = "Не удалось удалить ответ. Попробуйте еще раз.";
+  } finally {
+    confirmDeleteBtn.disabled = false;
+  }
 });
 
 deleteModal.addEventListener("click", (event) => {

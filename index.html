@@ -27,7 +27,7 @@
       </section>
 
       <figure class="photo-block card fade-in">
-        <img class="photo-1" src="assets/photo-1.png" alt="Серго и Мариам на крыше" />
+        <img class="photo-1" src="photo-1.png" alt="Серго и Мариам на крыше" />
       </figure>
 
       <section class="details card fade-in">
@@ -61,7 +61,7 @@
       </section>
 
       <figure class="photo-block card fade-in">
-        <img class="photo-2" src="assets/photo-2.png" alt="Пара сидит на крыше" />
+        <img class="photo-2" src="photo-2.png" alt="Пара сидит на крыше" />
       </figure>
 
       <section class="countdown card fade-in">
@@ -75,19 +75,26 @@
       </section>
 
       <figure class="photo-block card fade-in">
-        <img class="photo-3" src="assets/photo-3.png" alt="Серго и Мариам держатся за руки" />
+        <img class="photo-3" src="photo-3.png" alt="Серго и Мариам держатся за руки" />
       </figure>
 
-      <section class="music card fade-in">
-        <h2>Музыка вечера</h2>
-        <p>
-          Подберем плейлист, который создаст идеальное настроение для теплого
-          и красивого вечера.
-        </p>
+      <section class="love-note card fade-in">
+        <div class="love-note__date">
+          <span>02</span>
+          <small>августа</small>
+        </div>
+        <div>
+          <p class="love-note__eyebrow">С любовью</p>
+          <h2>Будем счастливы видеть вас рядом</h2>
+          <p>
+            Пусть этот вечер станет красивым воспоминанием, которое мы разделим
+            с самыми дорогими людьми.
+          </p>
+        </div>
       </section>
 
       <figure class="photo-block card fade-in">
-        <img class="photo-4" src="assets/photo-4.png" alt="Пара смотрит друг на друга" />
+        <img class="photo-4" src="photo-4.png" alt="Пара смотрит друг на друга" />
       </figure>
 
       <section class="map card fade-in">
@@ -241,7 +248,7 @@
       </section>
     </main>
 
-    <audio id="bg-music" src="assets/background-music.mp3" loop preload="auto"></audio>
+    <audio id="bg-music" src="background-music.mp3" loop preload="auto"></audio>
 
     <button id="music-toggle-btn" class="music-fab" type="button" aria-label="Управление музыкой" title="Громкость">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -251,7 +258,7 @@
       </svg>
     </button>
 
-    <div id="volume-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="volume-title">
+    <div id="volume-modal" class="modal is-hidden" role="dialog" aria-modal="true" aria-labelledby="volume-title">
       <div class="modal-card volume-modal-card">
         <h3 id="volume-title">Фоновая музыка</h3>
         <p>Charles Aznavour — Tous les visages de l'amour</p>
